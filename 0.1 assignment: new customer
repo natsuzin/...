@@ -1,0 +1,100 @@
+#include <iostream>
+#include <conio.h>
+
+using namespace std;
+
+int main()
+{
+    char opcao;
+    int numPratos;
+    float valInicial, valFinal, valCompra, faturamento, pagamento, quilo, tara, pesoComida, custoComida;
+
+    ////////////////// OPÇÃO 1 /////////////////////
+
+    cout << "Abrir caixa? [s/n]" << endl;
+    cin.get(opcao);
+
+    if(opcao!='s'){
+        cout << "Saindo do sistema sem a abertura do caixa...";
+    }else{
+        do{
+            cout << "Deposite um valor ao caixa:" << endl;
+            cin >> valInicial;
+        }while(valInicial<100);
+        do{
+            cout << "Informe o preço do quilo (kg) do alimento:" << endl;
+            cin >> quilo;
+        }while(quilo<1);
+        do{
+            cout << "Informe o peso da tara:" << endl;
+            cin >> tara;
+        }while(tara<0);
+
+        system("cls");
+
+        cout << "Valor no caixa: R$" << valInicial << endl;
+        cout << "Preço do quilo: R$" << quilo << endl;
+        cout << "Peso da tara: " << tara << "kg" << endl;
+        cout << "(Pressione qualquer tecla para continuar)" << endl;
+
+        getch();
+        system("cls");
+
+        ////////////////// OPÇÃO 2 /////////////////////
+
+        cout << "CAIXA ABERTO PARA NOVO CLIENTE" << endl;
+
+        do{
+            do{
+                do{
+                    cout << "Peso do prato de comida:" << endl;
+                    cin >> pesoComida;
+                }while(pesoComida<=tara);
+                    pesoComida=pesoComida-tara;
+                    custoComida=pesoComida*quilo;
+                    cout << "Peso do prato de comida descontando o peso da tara: " << pesoComida << "kg." << endl;
+                    cout << "Preço por quilo: R$" << quilo << endl;
+                    cout << "Preço do alimento: R$" << custoComida << endl;
+                    numPratos++;
+                    valCompra+=custoComida;
+                    valFinal+=custoComida;
+
+                    //cout << "Para adicionar mais um prato, prssione <+>. Para encerrar a compra, pressione <ENTER>." << endl;
+                    //como não conseguimos fazer o enter funcionar optamos pelo uso do [s/n]
+
+                    cout << "Mais um prato? [s/n]" << endl;
+                    cin >> opcao;
+            }while(opcao=='s');
+
+            system("cls");
+
+            cout << "FINALIZANDO COMPRA" << endl;
+            do{
+                cout << "Valor total da compra: R$" << valCompra << ". Insira uma quantia igual ou superior ao valor da compra: " << endl;
+                cin >> pagamento;
+            }while(pagamento<valCompra);
+
+            pagamento=pagamento-valCompra;
+            cout << "Troco: R$" << pagamento;
+            valCompra=0;
+
+            getch();
+            system("cls");
+
+            cout << "Novo cliente? [s/n]" << endl;
+            cin >> opcao;
+        }while(opcao=='s');
+
+        system("cls");
+
+            ////////////////// OPÇÃO 3 //////////////////////
+
+        valFinal=valFinal+valInicial;
+        faturamento=valFinal-valInicial;
+        cout << "FECHANDO CAIXA" << endl;
+        cout << "Número de pratos vendidos: " << numPratos << endl;
+        cout << "Valor no caixa: R$" << valFinal << endl;
+        cout << "Faturamento do dia: R$" << faturamento << endl;
+        }
+    return 0;
+}
