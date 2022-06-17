@@ -1,0 +1,199 @@
+#include <iostream>
+#include <stdlib.h>
+#include <string>
+
+using namespace std;
+
+int main()
+{
+    int codigo, i, posicao, qunt=0, aum, dim;
+    char opcao, n, s;
+    float preco;
+    string lista[15], nome;
+    unsigned int vetqunt[15]={};
+    float vetpreco[15]={};
+    bool nomeOk = false;
+
+    do{
+        system("cls");
+
+        cout << "BEM-VINDO AO MENU PRINCIPAL!" << endl << "Digite o código para realizar a ação que deseja:" << endl << "(OBS: é possível cadastrar até 15 produtos)" << endl;
+        cout << "1   Cadastrar produto" << endl;
+        cout << "2   Procurar e acessar informações do produto" << endl;
+        cout << "3   Diminuir/aumentar quantidade de produtos" << endl;
+        cout << "4   Excluir um produto" << endl;
+        cout << "5   Listar produtos com quantidade inferior a 5 unidades" << endl;
+        cin >> codigo;
+
+        switch(codigo){
+            case 1:   //CADASTRAR PRODUTO
+                do{
+                    system("cls");
+                    do{
+                        nomeOk = true;
+                        cout << "Insira o nome do produto: " << endl << "(OBS: o nome deve conter ao menos 1 caracter em seu nome.)" << endl;
+                        cin >> nome;
+                        if (nome.length()<1){
+                            cout << "Nome inválido";
+                            nomeOk = false;
+                        } else {
+                            posicao = -1;
+                            for(i=0; i<15; i++){
+                                if(nome==lista[i]){
+                                    cout << "Produto já cadastrado" << endl;
+                                    nomeOk = false;
+                                }
+                                if (posicao<0 && lista[i].length()==0){
+                                    posicao = i;
+                                }
+                            }
+                        }
+                    }while(!nomeOk);
+
+                    lista[posicao]=nome;
+
+                    do {
+                        cout << "Preço do produto " << nome << ": " << endl << "(OBS: o preço do produto deve ser igual ou superior a R$1.00)" << endl << "R$";
+                        cin >> preco;
+
+                        if(preco>=1){
+                            vetpreco[posicao]=preco;
+                        }else{
+                            cout << "Valor inválido. Tente novamente." << endl;
+                        }
+                    }while(preco<1);
+
+                    do {
+                        cout << "Quantidades do produto " << nome << " no estoque: " << endl << "(OBS: a quantidade máxima de produtos no estoque é de 50. Respeite o limite.)" << endl;
+                        cin >> qunt;
+
+                        if(qunt>0){
+                            vetqunt[posicao]=qunt;
+                        }else{
+                            cout << "Quantidade de produtos inválida. Tente novamente." << endl;
+                        }
+                    }while(qunt<1);
+
+                    cout << "Cadastrar novo produto? [S/N]" << endl;
+                    cin >> opcao;
+                }while(opcao==tolower('S') or opcao!=tolower('N'));
+
+                break;
+
+                case 2:   //PROCURAR PRODUTO
+                    system("cls");
+                    do{
+                        cout << "Digite o nome do produto que deseja visualizar: " << endl;
+                        cin >> nome;
+                        nomeOk = false;
+                        for(i=0;i<15;i++){
+                            if(nome==lista[i]){
+                                nomeOk = true;
+                                cout << "Informações do produto " << nome << ":" << endl;
+                                cout << "Preço: R$" << vetpreco[i] << endl << "Quantidade no estoque: " << vetqunt[i] << endl;
+                                break;
+                            }
+                        }
+                        if (!nomeOk){
+                                  cout<< "Produto inexistente. Tente novamente" << endl;
+                        }
+                        cout << "Procurar outro produto? [S/N]" << endl;
+                        cin >> opcao;
+                    }while(opcao==tolower('S') or opcao!=tolower('N'));
+
+                    break;
+
+                case 3:   //AUMENTAR/DIMINUIR ESTOQUE
+                    system("cls");
+                    do{
+                        cout << "Digite o nome do produto que deseja aumentar/diminuir o estoque: " << endl;
+                        cin >> nome;
+                        nomeOk=false;
+                        for(i=0;i<15;i++){
+                            if(nome==lista[i]){
+                                nomeOk=true;
+                                cout << "Digite o código correspondente: " << endl << "1.   Aumentar" << endl << "2.   Diminuir" << endl;
+                                cin >> codigo;
+                                        switch(codigo){
+                                            case 1:
+                                                cout << "Informe a quantidade que deseja aumentar:" << endl;
+                                                cin >> aum;
+                                                vetqunt[i]+=aum;
+                                                break;
+                                            case 2:
+                                                cout << "Informe a quantidade que deseja diminuir:" << endl;
+                                                cin >> dim;
+                                                vetqunt[i]-=dim;
+                                                break;
+                                    }
+                                }
+                            if(!nomeOk){
+                                  cout<< "Produto inexistente. Tente novamente";
+                            }
+                        }
+                        cout << "Aumentar/diminuir o estoque de outro produto? [S/N]" << endl;
+                        cin >> opcao;
+                    }while(opcao==tolower('S') or opcao!=tolower('N'));
+
+                break;
+
+                case 4:   //EXCLUIR PRODUTO
+                    system("cls");
+                    do{
+                        cout << "Informe o nome do produto que deseja excluir: " << endl;
+                        cin >> nome;
+                        nomeOk = false;
+                        for(i=0;i<15;i++){
+                            if(nome==lista[i]){
+                                nomeOk = true;
+                                cout << "Confirme a exclusão do produto " << nome << " informando o código correspondente: " << endl << "1.   Excluir" << endl << "2.   Não excluir" << endl;
+                                cin >> codigo;
+                                switch(codigo){
+                                      case 1:
+                                            lista[i]="";
+                                            vetqunt[i]=0;
+                                            vetpreco[i]=0;
+                                            cout << "Produto excluído com sucesso." << endl;
+                                            break;
+                                      case 2:
+                                            cout << "Produto não excluído." << endl;
+                                            break;
+                                }
+                            }
+                            if (!nomeOk){
+                                  cout<< "Produto inexistente. Tente novamente";
+                                  }
+                        }
+                        cout << endl << "Excluir outro produto? [S/N]" << endl;
+                        cin >> opcao;
+                    }while(opcao==tolower('S') or opcao!=tolower('N'));
+
+                break;
+
+                case 5:   //ESTOQUE INFERIOR A 5 UNIDADES
+                    system("cls");
+                    for(i=0;i<15;i++){
+                        if(vetqunt[i]<5 && lista[i]!=""){
+                            cout << "Produtos com quantidade inferior a 5 unidades: " << endl;
+                            cout << lista[i] << endl;
+                        }
+                        if(vetqunt[i]>4){
+                            cout << endl << "Não existem produtos com estoque inferior a 5 unidades." << endl;
+                        }
+                    }
+
+        }
+
+        cout << endl << "Voltar ao menu principal? [S/N]";
+        cin >> opcao;
+    }while(opcao==tolower('S') or opcao!=tolower('N'));
+
+    system("cls");
+
+//    for(i=0; i<15; i++){
+//    cout << lista[i] << endl;}
+
+    cout << "Saindo... Volte sempre!";
+
+    return 0;
+}
