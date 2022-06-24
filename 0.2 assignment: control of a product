@@ -185,7 +185,7 @@ int main()
         }
 
         cout << endl << "Voltar ao menu principal? [S/N]";
-        cin >> opcao;
+        cin.get(opcao);
     }while(opcao==tolower('S') or opcao!=tolower('N'));
 
     system("cls");
