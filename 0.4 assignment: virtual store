@@ -1,0 +1,405 @@
+#include <iostream>
+#include <stdlib.h>
+#include <limits>
+#include <time.h>
+
+using namespace std;
+
+typedef struct Nodo
+{
+    string nome;
+    int cod, qtdeEstq, qtdeVenda;
+    float preco, totalVenda;
+    struct Nodo *proximo;
+} Produto;
+
+char maisSN();
+void inclusaoProduto(Produto **produto);
+bool checaProduto(Produto *produto);
+void consultaProduto(Produto *produto);
+void exclusaoProduto(Produto **produto);
+void vendaProduto(Produto *produto);
+void relatorioUm(Produto *produto);
+void relatorioDois(Produto *produto);
+void ordenaProduto(Produto **produto);
+void destroiLista(Produto **produto);
+
+
+char maisSN()
+{
+    char c;
+    do
+    {
+        cout<< "Mais alguma acao? S/N" << endl;
+        c = toupper(cin.get());
+    }
+    while(c != 'S' && c != 'N');
+    return c;
+}
+
+int main()
+{
+    Produto *produto = NULL, *p;
+    char opcao;
+    int  x = 0;
+    char resp;
+    do
+    {
+        do
+        {
+            cout << "Escolha uma das opcoes: " << endl;
+            cout << "1 - Incluir um novo produto " << endl << "2 - Consultar um produto" << endl;
+            cout << "3 - Exclusao de um produto" << endl << "4 - Venda de um produto" << endl;
+            cout << "5 - Relatorio (produtos do estoque)" << endl << "6 - Relatorio (vendas realizadas)" << endl;
+            cin >> opcao;
+        }
+        while(not(opcao == '1' || opcao == '2' || opcao == '3' || opcao == '4' || opcao == '5' || opcao == '6'));
+        system("cls");
+
+        switch(opcao)
+        {
+        case '1':
+            inclusaoProduto(&produto);
+            if (checaProduto(produto) == true)
+            {
+                cout<< "Produto ja existente" << endl;
+                p = produto;
+                produto = p->proximo; // exclusao do 1o nodo
+                delete p; // libera memória do nodo excluido
+            }
+            else
+            {
+                cout << "Inclusao de produto confirmada" << endl;
+                ordenaProduto(&produto);
+
+            }
+            break;
+
+        case '2':
+            consultaProduto(produto);
+            break;
+
+        case '3':
+            exclusaoProduto(&produto);
+            break;
+
+        case '4':
+            vendaProduto(produto);
+            break;
+
+        case '5':
+            relatorioUm(produto);
+            break;
+
+        case '6':
+            relatorioDois(produto);
+        }
+        cin.ignore();
+        resp = maisSN();
+        system("cls");
+        system("pause");
+
+    }
+    while(resp == 'S');
+    destroiLista(&produto);
+}
+
+void inclusaoProduto(Produto **produto)
+{
+    Produto *p, *pant = *produto, *aux = *produto, *mini, *paux;
+    p = new Produto; //aloca memoria pra novo nodo
+
+    if(p == NULL)
+    {
+        cout << "Sem memoria";
+        cin.get();
+    }
+    cin.ignore();
+
+    do
+    {
+        cout << "Nome do produto: " << endl;
+        getline(cin, p -> nome);
+    }
+    while(p -> nome.size() == 0);
+
+    do
+    {
+        cout << "Qual a quantidade de unidades no estoque: " << endl;
+        cin >> p -> qtdeEstq;
+        while(cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(),'\n');
+            cout << "Qual a quantidade de unidades no estoque: " << endl;
+            cin >> p -> qtdeEstq;
+        }
+    }
+    while(p -> qtdeEstq < 1);
+
+    do
+    {
+        cout << "Qual o preco de venda: " << endl;
+        cin >> p ->preco;
+        while(cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(),'\n');
+            cout << "Qual o preço de venda : " << endl;
+            cin >> p ->preco;
+        }
+    }
+    while(p -> qtdeEstq < 0);
+    srand(time(NULL));
+    p -> cod = rand()%100+1;
+    p -> qtdeVenda = 0;
+    p ->totalVenda = 0;
+
+    p->proximo = *produto;
+    *produto = p;
+
+}
+bool checaProduto(Produto *produto)
+{
+    Produto *aux = produto;
+    while (aux -> proximo != NULL)
+    {
+        aux = aux-> proximo;
+        if(produto->nome == aux-> nome)
+        {
+            return true;
+        }
+    }
+}
+
+void ordenaProduto(Produto **produto)
+{
+    Produto *lista_ordenada = NULL, *atual = *produto, *guardado_proximo, *aux ;
+    //percorrendo lista e passando para a lista_ordenada auxiliar
+    while(atual != NULL)
+    {
+        //guardando ponteiro do proximo elemento
+        guardado_proximo = atual->proximo;
+        if (lista_ordenada == NULL || lista_ordenada->nome > atual->nome)
+        {
+            atual->proximo = lista_ordenada;
+            lista_ordenada = atual;
+        }
+        else
+        {
+            aux = lista_ordenada;
+            while (aux->proximo != NULL && aux->proximo->nome < atual->nome)
+            {
+                aux = aux->proximo;
+            }
+            atual->proximo = aux->proximo;
+            aux->proximo = atual;
+        }
+        atual=guardado_proximo;
+        *produto = lista_ordenada;
+    }
+}
+
+void consultaProduto(Produto *produto)
+{
+    string nome;
+    bool achou = false, z;
+    cin.ignore();
+    do
+    {
+        cout << "Qual produto voce quer consultar (por nome)?" << endl;
+        getline(cin,nome);
+    }
+    while(nome.size() == 0);
+
+    while(produto != NULL)
+    {
+        if(nome == produto -> nome)
+        {
+            cout << "Nome: " << produto ->nome << endl << "Codigo de catalogacao: " << produto ->cod << endl;
+            cout << "Quantidade no estoque:  " << produto ->qtdeEstq << endl << "Quantidade de unidades vendidas: " << produto ->qtdeVenda << endl;
+            cout << "Preco de venda: " << produto ->preco << endl;
+            achou = true;
+            break;
+        }
+        produto = produto -> proximo;
+    }
+    if (achou == false)
+    {
+        cout << "Produto inexistente";
+    }
+}
+
+void exclusaoProduto(Produto **produto)
+{
+    char opcao;
+    string nome;
+    bool achou = false;
+    Produto *p, *x, *pant = NULL;
+    p = *produto;
+    x = *produto;
+    do
+    {
+        cin.ignore();
+        cout << "Informe o nome do produto: ";
+        getline(cin, nome);
+    }
+    while(nome.size() == 0);
+    while (p != NULL)
+    {
+        if(p->nome == nome)
+        {
+            achou = true;
+        }
+        p = p -> proximo;
+    }
+    if(achou == true)
+    {
+        do
+        {
+            cout<< "Confirma exclusão? S/N\n";
+            opcao = toupper(cin.get());
+        }
+        while(opcao != 'S' and opcao != 'N');
+        if(opcao == 'N')
+            cout << "Exclusão não realizada\n";
+        else
+        {
+            if (x ->nome == nome)
+            {
+                *produto = x->proximo;
+                delete x;
+                return;
+            }
+            pant = *produto;
+            x = x->proximo;
+            while(x!=NULL and x->nome != nome)
+            {
+                pant = x;
+                x = x->proximo;
+            }
+            if(x!=NULL)
+            {
+                pant->proximo = x->proximo;
+                delete x;
+            }
+            cout << "Exclusão de produto confirmada\n";
+        }
+    }
+    else
+        cout << "Produto inexistente\n";
+}
+
+void vendaProduto(Produto *produto)
+{
+    bool achou = false;
+    float aux;
+    char c;
+    int codigo, uni;
+
+    do
+    {
+        cout << "Qual produto quer vender? (pelo codigo) " << endl;
+        cin >> codigo;
+        while(cin.fail())
+        {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(),'\n');
+            cout << "Qual produto quer vender? (pelo codigo) " << endl;
+            cin >> codigo;
+        }
+    }
+    while(codigo < 0 or codigo > 100);
+
+    while(produto != NULL)
+    {
+        if(produto ->cod == codigo)
+        {
+            achou = true;
+            break;
+        }
+        produto = produto -> proximo;
+    }
+    if(achou == true)
+    {
+        if (produto->qtdeVenda >= produto ->qtdeEstq)
+        {
+            cout << "Nao ha mais como vender o produto" << endl;
+            return;
+        }
+        do
+        {
+            cout << "Quantas unidades voce quer vender? (menor ou igual que o estoque)" << endl;
+            cin >> uni;
+            while(cin.fail())
+            {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(),'\n');
+                cout << "Quantas unidades voce quer vender? " << endl;
+                cin >> uni;
+            }
+            if(produto -> qtdeEstq < uni || (produto->qtdeEstq - produto ->qtdeVenda) < uni)
+                cout << "Quantidade acima do estoque disponivel de " << produto ->qtdeEstq - produto ->qtdeVenda << " produtos" << endl;
+        }
+        while(produto -> qtdeEstq < uni || uni < 1 || (produto->qtdeEstq - produto ->qtdeVenda) < uni);
+        cout << "Custa " << produto ->preco << " por unidade" << endl;
+        aux = produto ->preco *uni;
+        cout << "E o preco total eh: " << aux << endl;
+        produto -> totalVenda = produto -> totalVenda + produto -> preco * uni;
+        cin.ignore();
+        do
+        {
+            cout << "Confirmar venda? S/N " << endl;
+            c = toupper(cin.get());
+        }
+        while(c != 'S' && c != 'N');
+        if (c == 'S')
+        {
+            cout << "Venda realizada" << endl;
+            produto ->qtdeVenda =  produto ->qtdeVenda + uni;
+        }
+        else
+        {
+            cout << "Venda não realizada" << endl;
+        }
+    }
+    else
+    {
+        cout << "Produto inexistente" << endl;
+    }
+}
+void relatorioUm(Produto *produto)
+{
+    while (produto != NULL)
+    {
+        cout << "Nome: " << produto ->nome << endl << "Codigo de catalogacao: " << produto ->cod << endl;
+        cout << "Quantidade no estoque:  " << produto ->qtdeEstq << endl << "Quantidade de unidades vendidas: " << produto ->qtdeVenda << endl;
+        cout << "Preco de venda: " << produto ->preco << endl;
+        cout << "----------------------------------------------------------" << endl;
+        produto = produto->proximo;
+    }
+}
+
+void relatorioDois(Produto *produto)
+{
+    int uni;
+    while (produto != NULL && produto ->qtdeVenda > 0)
+    {
+        cout << "Codigo do produto: " << produto -> cod << endl;
+        cout << "Quantidade vendida: " << produto -> qtdeVenda << endl;
+        cout << "Total de vendas: " << produto -> totalVenda << " reais" << endl;
+        cout << "----------------------------------------------------------" << endl;
+        produto = produto->proximo;
+    }
+}
+
+void destroiLista(Produto **produto)    // ponteiro de ponteiro
+{
+    Produto *p;
+    while (*produto != NULL)
+    {
+        p = *produto;
+        *produto = (*produto)->proximo;
+        delete p;
+    }
+}
