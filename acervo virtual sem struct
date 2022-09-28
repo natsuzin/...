@@ -295,7 +295,7 @@ void consultaLivro(int n, string titulo[], string autor[], string editora[], str
 void exclusaoLivro(int &n, string titulo[], string autor[], string editora[], string isbn[], int quant[])
 {
     string aux;
-    bool resp resp2;
+    bool resp, resp2;
     cin.ignore();
     do{
         cout << "Informe o ISBN: ";
