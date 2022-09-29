@@ -175,7 +175,6 @@ bool validacaoQuant(int aux)
 {
     if(aux<1)
         return false;
-
     return true;
 }
 
