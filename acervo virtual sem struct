@@ -1,13 +1,13 @@
 #include <iostream>
 #include <cstring>
-#include <stdlib.h>
+#include <cstdlib>
 #include <cctype>
 #define TMAX 50
 using namespace std;
 
 int menu();
 void ordenaAcervo(int,string[],string[],string[],string[],int[]);
-bool pesquisaISBN(int,string,string);
+int pesquisaERetornaISBN(int,string,string);
 bool validacaoVazio(string);
 bool verificaSeDifDig(string);
 bool verificaSeDifLet(string);
@@ -108,12 +108,12 @@ void ordenaAcervo(int n, string titulo[], string autor[], string editora[], stri
     }
 }
 
-bool pesquisaISBN(int n, string aux, string isbn[])
+int pesquisaERetornaISBN(int n, string aux, string isbn[])
 {
     for(int i=0;i<n;i++)
         if(aux==isbn[i])
-            return true;
-    return false;
+            return i;
+    return -1;
 }
 
 bool validacaoVazio(string aux)
@@ -142,7 +142,7 @@ bool verificaSeDifLet(string aux)
 bool validacaoISBN(string aux)
 {
     bool resp;
-    if(aux.size()!=13)
+    if(aux.size()!=4)
         return false;
     resp=verificaSeDifDig(aux);
     if(resp)
@@ -182,7 +182,7 @@ bool validacaoQuant(int aux)
 void inclusaoLivro(int &n, string titulo[], string autor[], string editora[], string isbn[], int quant[])
 {
     string aux;
-    int auxNum;
+    int auxNum, pos;
     bool resp, resp2;
 
     cout << "PARA INCLUIR NOVO LIVRO, INFORME:" << endl;
@@ -195,11 +195,8 @@ void inclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
         if(!resp || !resp2)
             cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
     }while(!resp || !resp2);
-    resp=pesquisaISBN(n,aux,isbn);
-    if(resp)
-        cout << "Livro já existente.";
-
-    if(!resp){
+    pos=pesquisaERetornaISBN(n,aux,isbn);
+    if(pos==-1){
         isbn[n]=aux;
         do{
             cout << "TÍTULO: ";
@@ -245,11 +242,14 @@ void inclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
         n++;
         cout << "Inclusão de título confirmada." << endl;
     }
+    else
+        cout << "Livro já existente." << endl;
 }
 
 void consultaLivro(int n, string titulo[], string autor[], string editora[], string isbn[], int quant[])
 {
     string aux;
+    int pos;
     bool resp, resp2;
     cin.ignore();
     do{
@@ -260,18 +260,15 @@ void consultaLivro(int n, string titulo[], string autor[], string editora[], str
         if(!resp || !resp2)
                 cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
     }while(!resp || !resp2);
-    resp=pesquisaISBN(n,aux,isbn);
-    if(resp)
-        for(unsigned int i=0;i<n;i++)
-            if(aux==isbn[i]){
-                cout << "\nISBN: " << isbn[i] << endl;
-                cout << "TÍTULO: " << titulo[i] << endl;
-                cout << "AUTOR: " << autor[i] << endl;
-                cout << "EDITORA: " << editora[i] << endl;
-                cout << "QUANTIDADE: " << quant[i] << endl;
-                cout << endl;
-                break;
-            }
+    pos=pesquisaERetornaISBN(n,aux,isbn);
+    if(pos!=-1){
+        cout << "\nISBN: " << isbn[pos] << endl;
+        cout << "TÍTULO: " << titulo[pos] << endl;
+        cout << "AUTOR: " << autor[pos] << endl;
+        cout << "EDITORA: " << editora[pos] << endl;
+        cout << "QUANTIDADE: " << quant[pos] << endl;
+        cout << endl;
+    }
     else
         cout << "Livro inexistente." << endl;
 }
@@ -279,6 +276,7 @@ void consultaLivro(int n, string titulo[], string autor[], string editora[], str
 void exclusaoLivro(int &n, string titulo[], string autor[], string editora[], string isbn[], int quant[])
 {
     string aux;
+    int pos;
     bool resp, resp2;
     cin.ignore();
     do{
@@ -289,27 +287,24 @@ void exclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
         if(!resp || !resp2)
             cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
     }while(!resp || !resp2);
-    resp=pesquisaISBN(n,aux,isbn);
-    if(resp){
-        for(unsigned int i=0;i<n;i++)
-            if(aux==isbn[i]){
-                isbn[i]=isbn[n-1];
-                titulo[i]=titulo[n-1];
-                autor[i]=autor[n-1];
-                editora[i]=editora[n-1];
-                quant[i]=quant[n-1];
-                n--;
-                cout << "Livro excluído." << endl;
-            }
+    pos=pesquisaERetornaISBN(n,aux,isbn);
+    if(pos!=-1){
+        isbn[pos]=isbn[n-1];
+        titulo[pos]=titulo[n-1];
+        autor[pos]=autor[n-1];
+        editora[pos]=editora[n-1];
+        quant[pos]=quant[n-1];
+        n--;
+        cout << "Livro excluído." << endl;
     }
-    if(!resp)
+    else
         cout << "Livro inexistente, impossível excluir." << endl;
 }
 
 void aquisicaoLivro(int n, string isbn[], int quant[])
 {
     string aux;
-    int auxNum;
+    int auxNum, pos;
     bool resp, resp2;
     cin.ignore();
     do{
@@ -320,23 +315,19 @@ void aquisicaoLivro(int n, string isbn[], int quant[])
         if(!resp || resp2)
             cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
     }while(!resp || resp2);
-    resp=pesquisaISBN(n,aux,isbn);
-    if(resp){
-        for(int i=0;i<n;i++){
-            if(aux==isbn[i]){
-                do{
-                    cout << "QUANTIDADE DE EXEMPLARES ADQUIRIDOS: ";
-                    cin >> auxNum;
-                    resp=validacaoQuant(auxNum);
-                    if(!resp)
-                        cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
-                }while(!resp);
-                quant[i]+=auxNum;
-                cout << "Exemplares incluídos." << endl;
-            }
-        }
+    pos=pesquisaERetornaISBN(n,aux,isbn);
+    if(pos!=-1){
+        do{
+            cout << "QUANTIDADE DE EXEMPLARES ADQUIRIDOS: ";
+            cin >> auxNum;
+            resp=validacaoQuant(auxNum);
+            if(!resp)
+                cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
+        }while(!resp);
+        quant[pos]+=auxNum;
+        cout << "Exemplares incluídos." << endl;
     }
-    if(!resp)
+    else
         cout << "Livro inexistente." << endl;
 }
 
