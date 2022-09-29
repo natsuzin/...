@@ -7,7 +7,7 @@ using namespace std;
 
 int menu();
 void ordenaAcervo(int,string[],string[],string[],string[],int[]);
-int pesquisaERetornaISBN(int,string,string);
+int pesquisaISBNeRetornaPos(int,string,string);
 bool validacaoVazio(string);
 bool verificaSeDifDig(string);
 bool verificaSeDifLet(string);
@@ -108,7 +108,7 @@ void ordenaAcervo(int n, string titulo[], string autor[], string editora[], stri
     }
 }
 
-int pesquisaERetornaISBN(int n, string aux, string isbn[])
+int pesquisaISBNeRetornaPos(int n, string aux, string isbn[])
 {
     for(int i=0;i<n;i++)
         if(aux==isbn[i])
@@ -195,7 +195,7 @@ void inclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
         if(!resp || !resp2)
             cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
     }while(!resp || !resp2);
-    pos=pesquisaERetornaISBN(n,aux,isbn);
+    pos=pesquisaISBNeRetornaPos(n,aux,isbn);
     if(pos==-1){
         isbn[n]=aux;
         do{
@@ -232,11 +232,17 @@ void inclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
 
         do{
             cout << "QUANTIDADE: ";
-            cin >> auxNum;
-            resp=validacaoQuant(auxNum);
-            if(!resp)
+            getline(cin,aux);
+            resp=verificaSeDifDig(aux);
+            if(resp)
                 cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
-        }while(!resp);
+            else{
+                auxNum=atoi(aux.c_str());
+                resp2=validacaoQuant(auxNum);
+                if(!resp2)
+                    cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
+            }
+        }while(resp || !resp2);
         quant[n]=auxNum;
 
         n++;
@@ -260,7 +266,7 @@ void consultaLivro(int n, string titulo[], string autor[], string editora[], str
         if(!resp || !resp2)
                 cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
     }while(!resp || !resp2);
-    pos=pesquisaERetornaISBN(n,aux,isbn);
+    pos=pesquisaISBNeRetornaPos(n,aux,isbn);
     if(pos!=-1){
         cout << "\nISBN: " << isbn[pos] << endl;
         cout << "TÍTULO: " << titulo[pos] << endl;
@@ -287,7 +293,7 @@ void exclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
         if(!resp || !resp2)
             cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
     }while(!resp || !resp2);
-    pos=pesquisaERetornaISBN(n,aux,isbn);
+    pos=pesquisaISBNeRetornaPos(n,aux,isbn);
     if(pos!=-1){
         isbn[pos]=isbn[n-1];
         titulo[pos]=titulo[n-1];
@@ -315,15 +321,21 @@ void aquisicaoLivro(int n, string isbn[], int quant[])
         if(!resp || resp2)
             cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
     }while(!resp || resp2);
-    pos=pesquisaERetornaISBN(n,aux,isbn);
+    pos=pesquisaISBNeRetornaPos(n,aux,isbn);
     if(pos!=-1){
         do{
             cout << "QUANTIDADE DE EXEMPLARES ADQUIRIDOS: ";
-            cin >> auxNum;
-            resp=validacaoQuant(auxNum);
-            if(!resp)
+            getline(cin,aux);
+            resp=verificaSeDifDig(aux);
+            if(resp)
                 cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
-        }while(!resp);
+            else{
+                auxNum=atoi(aux.c_str());
+                resp2=validacaoQuant(auxNum);
+                if(!resp2)
+                    cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
+            }
+        }while(resp || !resp2);
         quant[pos]+=auxNum;
         cout << "Exemplares incluídos." << endl;
     }
