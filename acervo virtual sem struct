@@ -7,8 +7,6 @@ using namespace std;
 
 int menu();
 void ordenaAcervo(int,string[],string[],string[],string[],int[]);
-string leiaString();
-int leiaNum();
 bool pesquisaISBN(int,string,string);
 bool validacaoVazio(string);
 bool verificaSeDifDig(string);
@@ -110,20 +108,6 @@ void ordenaAcervo(int n, string titulo[], string autor[], string editora[], stri
     }
 }
 
-string leiaString()
-{
-    string aux;
-    getline(cin, aux);
-    return aux;
-}
-
-int leiaNum()
-{
-    int aux;
-    cin >> aux;
-    return aux;
-}
-
 bool pesquisaISBN(int n, string aux, string isbn[])
 {
     for(int i=0;i<n;i++)
@@ -205,7 +189,7 @@ void inclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
     cin.ignore();
     do{
         cout << "ISBN: ";
-        aux=leiaString();
+        getline(cin,aux);
         resp=validacaoVazio(aux);
         resp2=validacaoISBN(aux);
         if(!resp || !resp2)
@@ -219,7 +203,7 @@ void inclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
         isbn[n]=aux;
         do{
             cout << "TÍTULO: ";
-            aux=leiaString();
+            getline(cin,aux);
             resp=validacaoVazio(aux);
             if(!resp)
                 cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
@@ -229,7 +213,7 @@ void inclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
 
         do{
             cout << "AUTOR: ";
-            aux=leiaString();
+            getline(cin,aux);
             resp=validacaoVazio(aux);
             resp2=validacaoNomeAutor(aux);
             if(!resp || !resp2)
@@ -240,7 +224,7 @@ void inclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
 
         do{
             cout << "EDITORA: ";
-            aux=leiaString();
+            getline(cin,aux);
             resp=validacaoVazio(aux);
             resp2=verificaSeDifLet(aux);
             if(!resp || resp2)
@@ -251,7 +235,7 @@ void inclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
 
         do{
             cout << "QUANTIDADE: ";
-            auxNum=leiaNum();
+            cin >> auxNum;
             resp=validacaoQuant(auxNum);
             if(!resp)
                 cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
@@ -270,7 +254,7 @@ void consultaLivro(int n, string titulo[], string autor[], string editora[], str
     cin.ignore();
     do{
         cout << "Informe o ISBN: ";
-        aux=leiaString();
+        getline(cin,aux);
         resp=validacaoVazio(aux);
         resp2=validacaoISBN(aux);
         if(!resp || !resp2)
@@ -299,7 +283,7 @@ void exclusaoLivro(int &n, string titulo[], string autor[], string editora[], st
     cin.ignore();
     do{
         cout << "Informe o ISBN: ";
-        aux=leiaString();
+        getline(cin,aux);
         resp=validacaoVazio(aux);
         resp2=validacaoISBN(aux);
         if(!resp || !resp2)
@@ -330,7 +314,7 @@ void aquisicaoLivro(int n, string isbn[], int quant[])
     cin.ignore();
     do{
         cout << "Informe o ISBN: ";
-        aux=leiaString();
+        getline(cin,aux);
         resp=validacaoISBN(aux);
         resp2=verificaSeDifDig(aux);
         if(!resp || resp2)
@@ -340,9 +324,9 @@ void aquisicaoLivro(int n, string isbn[], int quant[])
     if(resp){
         for(int i=0;i<n;i++){
             if(aux==isbn[i]){
-                cout << "QUANTIDADE DE EXEMPLARES ADQUIRIDOS: ";
                 do{
-                    auxNum=leiaNum();
+                    cout << "QUANTIDADE DE EXEMPLARES ADQUIRIDOS: ";
+                    cin >> auxNum;
                     resp=validacaoQuant(auxNum);
                     if(!resp)
                         cout << "Inconsistência(s) encontrada(s). Tente novamente." << endl;
