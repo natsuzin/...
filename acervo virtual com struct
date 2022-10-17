@@ -450,6 +450,40 @@ void incluiCompromisso(int n,Agenda data[])
     else cout << "Data nao encontrada." << endl;
 }
 
+void excluiCompromisso(int n, Agenda data[])
+{
+    char ch;
+    string aux;
+    int posdia, poshora;
+    bool resp;
+    
+    cout << "EXCLUSAO DE COMPROMISSO" << endl;
+    cout << endl;
+    aux=entradaDeDadosData();
+    cout << "Data: " << aux << endl;
+    posdia=pesquisaDataERetornaPos(n,data,aux);
+    if(posdia!=-1){
+        do{
+            cout << "Informe o horario (formato: 00:00): ";
+            getline(cin,aux);
+            resp=validaHora(aux);
+            if(!resp)
+                cout << "Dados inconsistentes. Tente novamente." << endl;
+        }while(!resp);
+        poshora=pesquisaHoraERetornaPos(posdia,data,aux,data[posdia].m);
+        if(poshora!=-1){
+            cout << endl;
+            //cout << data[]
+            do{
+                cout << "Confirme sua escolha. Excluir compromisso? [S/N]" << endl;
+                ch=toupper(cin.get());
+            }while(ch!='S' && ch!='N');
+        }
+        else cout << "Horario nao encontrado." << endl;
+    }
+    else cout << "Data nao encontrada." << endl;
+}
+
 void relatorio1(int n, Agenda data[])
 {
     string aux;
