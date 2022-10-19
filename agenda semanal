@@ -300,9 +300,9 @@ void iniciaSemana(Agenda data[]){
     do{
         cout << "Confirme sua escolha. Iniciar nova semana? [S/N]" << endl;
         ch=toupper(cin.get());
+        cin.ignore();
     }while(ch!='S' && ch!='N');
     system("cls");
-    cin.ignore();
     if(ch=='S'){
         cout << "Escolha confirmada: iniciar." << endl << endl;
         aux=entradaDeDadosData();
