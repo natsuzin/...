@@ -396,7 +396,6 @@ void incluiCompromisso(Agenda data[]){
                 }while(!resp);
 
                 data[posdia].comp[data[posdia].m]=auxc;
-
                 cout << "Compromisso incluido." << endl;
                 data[posdia].m++;
                 ordenaComp(data,data[posdia].m,posdia,0,data[posdia].m-1);
