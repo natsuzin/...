@@ -30,7 +30,7 @@ bool validaHoraInicialxFinal(string,string);
 int pesquisaDataERetornaPos(int,Agenda[],string);
 int pesquisaHoraERetornaPos(int,Agenda[],string,int);
 int pesquisaHoraFinalERetornaPos(int,Agenda[],string,int);
-int ordenaComp(Agenda[],int,int);
+int ordenaComp(Agenda[],int,int,int,int);
 string entradaDeDadosData();
 void iniciaSemana(Agenda[]);
 void incluiCompromisso(Agenda[]);
