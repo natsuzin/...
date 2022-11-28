@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <stdlib.h                                                                     >
+#include <stdlib.h                                                                     
 using namespace std;
 
 typedef struct Nodo
@@ -19,7 +19,7 @@ typedef struct Nodo2
 int pesquisaCodigo(Aeroporto *aero, int elem)
 {
     if (aero==NULL)
-        return NULL;
+        return -1;
     while(aero!=NULL)
     {
         if(aero->cod==elem)
@@ -78,6 +78,7 @@ void CadastraVoo(Aeroporto *aero, Voo **v)
         cout << "Aeroporto inexistente. Não foi possível cadastrar voo." << endl;
         return;
     }
+    
     p=new Voo;
     if(p==NULL)
     {
