@@ -1,0 +1,542 @@
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <time.h>
+#include <fstream>
+
+using namespace std;
+
+typedef struct Nodo
+{
+    int cod, numvoo;
+    struct Nodo *prox;
+} Voo;
+
+typedef struct
+{
+    string cidade, sigla;
+    int cod;
+    Voo *listaVoos;
+} Aeroporto;
+
+void menu()
+{
+    cout << "----------- Menu -----------" << endl;
+    cout << "AEROPORTO" << endl;
+    cout << " 1 - Cadastrar" << endl;
+    cout << " 2 - Remover" << endl;
+    cout << " 3 - Relatorio" << endl;
+    cout << "VOO" << endl;
+    cout << " 4 - Cadastrar" << endl;
+    cout << " 5 - Remover" << endl;
+    cout << " 6 - Relatorio" << endl;
+    cout << " 7 - Procurar" << endl;
+    cout << endl;
+    cout << " 8 - Sair" << endl;
+    cout << "----------------------------" << endl;
+    cout << "Opcao: ";
+}
+
+void toUpper(string &);
+bool validacaoVazio(string);
+bool verificaSeDifDig(string);
+bool verificaSeDifLet(string);
+bool pesquisaCidade(int, Aeroporto[], string);
+int pesquisaCodigo(int, Aeroporto[], int);
+void ordenaAeroportos(Aeroporto[], int);
+
+void cadastraAeroporto(Aeroporto[], int &, string, string);
+void removeAeroporto(Aeroporto[], int &, int);
+void mostraAeroporto(Aeroporto[], int);
+void cadastraVoo(Aeroporto[], int, int);
+void removeVoo(Aeroporto[], int, int);
+void mostraVoos(Aeroporto[], int);
+//  void procuraVoo(codigoOrigem, codigoDestino, maxConexoes)
+
+void destroiLista(Aeroporto[], int);
+
+int main()
+{
+    string sigla, cidade, cods;
+    int n = 0, op, cod, cod2, numv;
+    bool resp;
+    Aeroporto vet[10];
+
+    do
+    {
+        ordenaAeroportos(vet, n);
+        system("cls");
+        do
+        {
+            menu();
+            cin >> op;
+        } while (op < 1 || op > 8);
+        system("cls");
+        cin.ignore();
+
+        switch (op)
+        {
+        case 1:
+            cout << "CADASTRO - AEROPORTO\n"
+                 << endl;
+            if (n <= 10)
+            {
+                do
+                {
+                    cout << "Informe a sigla (3 letras): ";
+                    getline(cin, sigla);
+                    resp = verificaSeDifLet(sigla);
+                    if (!resp)
+                        cout << "Dados inconsistentes. Tente novamente." << endl;
+                } while (sigla.size() != 3 || !resp);
+                toUpper(sigla);
+                do
+                {
+                    cout << "Informe a cidade: ";
+                    getline(cin, cidade);
+                    resp = verificaSeDifLet(cidade);
+                    if (cidade.size() < 1 || !resp)
+                        cout << "Dados inconsistentes. Tente novamente." << endl;
+                } while (cidade.size() < 1 || !resp);
+                toUpper(cidade);
+                resp = pesquisaCidade(n, vet, cidade);
+                if (!resp)
+                {
+                    cadastraAeroporto(vet, n, sigla, cidade);
+                    cout << "\nAeroporto cadastrado." << endl;
+                }
+                else
+                    cout << "\nEsta cidade ja possui um aeroporto cadastrado." << endl;
+            }
+            else
+                cout << "O limite de aeroportos cadastrados foi atingido." << endl;
+            break;
+        case 2:
+            cout << "REMOVE - AEROPORTO\n"
+                 << endl;
+            do
+            {
+                do
+                {
+                    cout << "Informe o codigo do aeroporto que deseja excluir: ";
+                    getline(cin, cods);
+                    resp = verificaSeDifDig(cods);
+                    if (cods.size() < 1 || !resp)
+                        cout << "Dados inconsistentes. Tente novamente." << endl;
+                } while (cods.size() < 1 || !resp);
+                cod = atoi(cods.c_str());
+                if (cod < 1)
+                    cout << "Dados inconsistentes. Tente novamente." << endl;
+            } while (cod < 1);
+            cod = pesquisaCodigo(n, vet, cod);
+            if (cod == -1)
+                cout << "\nAeroporto inexistente. Impossivel efetuar acao." << endl;
+            else
+            {
+                cout << "\nAeroporto: ";
+                cout << vet[cod].sigla << "-" << vet[cod].cidade << endl;
+                removeAeroporto(vet, n, cod);
+                cout << "Aeroporto removido." << endl;
+            }
+            break;
+        case 3:
+            cout << "RELATORIO - AEROPORTOS\n"
+                 << endl;
+            mostraAeroporto(vet, n);
+            break;
+        case 4:
+            cout << "CADASTRO - VOO\n"
+                 << endl;
+            do
+            {
+                do
+                {
+                    cout << "Informe o codigo do aeroporto de origem: ";
+                    getline(cin, cods);
+                    resp = verificaSeDifDig(cods);
+                    if (cods.size() < 1 || !resp)
+                        cout << "Dados inconsistentes. Tente novamente." << endl;
+                } while (cods.size() < 1 || !resp);
+                cod = atoi(cods.c_str());
+                if (cod < 1)
+                    cout << "Dados inconsistentes. Tente novamente." << endl;
+            } while (cod < 1);
+            cod = pesquisaCodigo(n, vet, cod);
+            if (cod == -1)
+                cout << "\nAeroporto inexistente. Impossivel efetuar acao." << endl;
+            else
+            {
+                do
+                {
+                    do
+                    {
+                        cout << "Informe o codigo do aeroporto de destino: ";
+                        getline(cin, cods);
+                        resp = verificaSeDifDig(cods);
+                        if (cods.size() < 1 || !resp)
+                            cout << "Dados inconsistentes. Tente novamente." << endl;
+                    } while (cods.size() < 1 || !resp);
+                    cod2 = atoi(cods.c_str());
+                    if (cod2 < 1)
+                        cout << "Dados inconsistentes. Tente novamente." << endl;
+                } while (cod2 < 1);
+                cod2 = pesquisaCodigo(n, vet, cod2);
+                if (cod2 == -1)
+                {
+                    cout << "\nAeroporto inexistente. Impossivel efetuar acao." << endl;
+                }
+                else
+                {
+                    cadastraVoo(vet, cod, cod2);
+                    cout << "\nVoo cadastrado." << endl;
+                }
+            }
+            break;
+        case 5:
+            cod = 0;
+            cout << "REMOVE - VOO\n"
+                 << endl;
+            do
+            {
+                do
+                {
+                    cout << "Informe o codigo do aeroporto de origem: ";
+                    cin >> cods;
+                    resp = verificaSeDifDig(cods);
+                    if (cods.size() < 1 || !resp)
+                        cout << "Dados inconsistentes. Tente novamente." << endl;
+                } while (cods.size() < 1 || !resp);
+                cod = atoi(cods.c_str());
+                if (cod < 1)
+                    cout << "Dados inconsistentes. Tente novamente." << endl;
+            } while (cod < 1);
+            cod = pesquisaCodigo(n, vet, cod);
+            if (cod == -1)
+                cout << "\nAeroporto inexistente. Impossivel efetuar acao." << endl;
+            else
+            {
+                do
+                {
+                    do
+                    {
+                        cout << "Informe o numero do voo: ";
+                        cin >> cods;
+                        resp = verificaSeDifDig(cods);
+                        if (cods.size() < 1 || !resp)
+                            cout << "Dados inconsistentes. Tente novamente." << endl;
+                    } while (cods.size() < 1 || !resp);
+                    numv = atoi(cods.c_str());
+                    if (numv < 1)
+                        cout << "Dados inconsistentes. Tente novamente." << endl;
+                } while (numv < 1);
+
+                int variavel;
+                for (int i = 0; i < 10; i++)
+                {
+                    if (vet[i].cod == cod)
+                    {
+                        variavel = i;
+                        break;
+                    }
+                }
+
+                if (numv == vet[cod].listaVoos->numvoo)
+                {
+                removeVoo(vet, variavel, numv);
+                cout << "Voo removido." << endl;
+                }
+                else
+                   cout << "\nVoo inexistente. Impossivel efetuar acao." << endl;
+            }
+            break;
+        case 6:
+            cout << "RELATORIO - VOOS\n\n";
+            for (int i = 0; i < n; i++)
+            {
+                cout << "\nAeroporto: "
+                     << "|" << vet[i].cod << "| " << vet[i].cidade << endl;
+                mostraVoos(vet, i);
+            }
+            break;
+            //  case 7:
+            //   void procuraVoo(codigoOrigem, codigoDestino, maxConexoes)
+        }
+        system("pause");
+    } while (op != 8);
+    cout << "\nProgram by Igor do Carmo and Nathalia Suzin " << endl;
+    cout << "Saindo..." << endl;
+    destroiLista(vet, n);
+    return 0;
+}
+void toUpper(string &aux)
+{
+    char a;
+    string aux2 = "";
+    for (unsigned int i = 0; i < aux.size(); i++)
+    {
+        a = toupper(aux[i]);
+        aux2 += a;
+    }
+    aux = aux2;
+}
+
+bool validacaoVazio(string aux)
+{
+    if (aux.size() == 0)
+        return false;
+    return true;
+}
+
+bool verificaSeDifDig(string aux)
+{
+    for (unsigned int i = 0; i < aux.size(); i++)
+        if (!isdigit(aux.at(i)))
+            return false;
+    return true;
+}
+
+bool verificaSeDifLet(string aux)
+{
+    for (unsigned int i = 0; i < aux.size(); i++)
+        if (!isalpha(aux.at(i)))
+            return false;
+    return true;
+}
+
+bool pesquisaCidade(int n, Aeroporto vet[], string elem)
+{
+    if (elem == vet[n].cidade)
+        return true;
+    if (n == 0)
+        return false;
+    return pesquisaCidade(n - 1, vet, elem);
+}
+
+int pesquisaCodigo(int n, Aeroporto vet[], int elem)
+{
+    for (int i = 0; i < n; i++)
+        if (elem == vet[i].cod)
+            return vet[i].cod;
+    return -1;
+}
+
+void ordenaAeroportos(Aeroporto vet[], int n)
+{
+    int i, j;
+    Aeroporto aux;
+    for (i = 0; i < n - 1; i++)
+    {
+        int menor = i;
+        for (j = i + 1; j < n; j++)
+            if (vet[j].cod < vet[menor].cod)
+                menor = j;
+
+        aux = vet[i];
+        vet[i] = vet[menor];
+        vet[menor] = aux;
+    }
+}
+
+void cadastraAeroporto(Aeroporto vet[], int &n, string sigla, string cidade)
+{
+    int rcode;
+    bool valid = false;
+    vet[n].sigla = sigla;
+    vet[n].cidade = cidade;
+    vet[n].listaVoos = NULL;
+
+    srand(time(NULL));
+    while (!valid)
+    {
+        valid = true;
+        rcode = rand() % 10 + 1;
+        for (int i = 0; i < n; i++)
+        {
+            if (rcode == vet[i].cod)
+                valid = false;
+        }
+    }
+    vet[n].cod = rcode;
+    n++;
+}
+
+void destroiListaVoo(Voo *listaVoo)
+{
+    Voo *p;
+    while (listaVoo != NULL)
+    {
+        p = listaVoo;
+        listaVoo = (listaVoo)->prox;
+        delete p;
+    }
+}
+
+void removeAeroporto(Aeroporto vet[], int &n, int aero)
+{
+    destroiListaVoo(vet[aero].listaVoos);
+    vet[aero] = vet[n - 1];
+    n--;
+}
+
+void mostraAeroporto(Aeroporto vet[], int n)
+{
+    for (int i = 0; i < n; i++)
+        cout << "| " << vet[i].cod << " | " << vet[i].sigla << " - " << vet[i].cidade << endl;
+}
+
+void cadastraVoo(Aeroporto vet[], int codorigem, int coddestino)
+{
+    Voo *p = new Voo;
+    srand(time(NULL));
+    p->numvoo = rand() % 500 + 1;
+    p->prox = NULL;
+    p->cod = coddestino;
+    int variavel;
+
+    for (int i = 0; i < 10; i++)
+    {
+        if (vet[i].cod == codorigem)
+        {
+            variavel = i;
+            break;
+        }
+    }
+
+    if (vet[variavel].listaVoos == NULL)
+        vet[variavel].listaVoos = p;
+    else
+        vet[variavel].listaVoos->prox = p;
+}
+
+void removeVoo(Aeroporto vet[], int i, int elemento)
+{
+    Voo *p, *pant = NULL;
+    p = vet[i].listaVoos;
+    if (p != NULL)
+    {
+        if (p->numvoo == elemento)
+        {
+            vet[i].listaVoos = p->prox;
+            delete p;
+            return;
+        }
+        pant = vet[i].listaVoos;
+        p = p->prox;
+        while (p != NULL || p->numvoo != elemento)
+        {
+            pant = p;
+            p = p->prox;
+        }
+        if (p != NULL)
+        {
+            pant->prox = p->prox;
+            delete p;
+        }
+    }
+}
+
+void mostraVoos(Aeroporto vet[], int i)
+{
+    Voo *p = vet[i].listaVoos;
+    while (p != NULL)
+    {
+        cout << p->cod << " - " << p->numvoo << endl;
+        p = p->prox;
+    }
+}
+
+/*
+void procuraVoo(Aeroporto vet[], int n)
+{
+    int aero, cod, conex;
+    cout << "Procura Voo.." << endl;
+    cout << "\nCodigo do aeroporto de origem: ";
+    cin >> aero;
+    aero = pesquisaCodigo(n, vet, aero);
+    if (aero == -1)
+    {
+        cout << "Aeroporto inexistente." << endl;
+        return;
+    }
+    else
+    {
+        cout << "Codigo do aeroporto destino: ";
+        cin >> cod;
+        cod = pesquisaCodigo(n, vet, cod);
+        if (cod == -1)
+        {
+            cout << "Aeroporto inexistente." << endl;
+            return;
+        }
+        else
+        {
+            cout << "informe o numero de connexoes que deseja ver" << endl;
+            cin >> conex;
+            exibeVoo(vet, cod, aero, conex, n);
+        }
+    }
+}
+
+void exibeVoo(Aeroporto vet[], int codD, int codO, int conex, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        if (codO == vet[i].cod)
+        {
+            Voo *p = vet[i].listaVoos;
+            for (int j = 0; j < n; j++)
+            {
+                if (codD == vet[j].cod)
+                {
+                    Voo *q = vet[j].listaVoos;
+                    while (p != NULL)
+                    {
+                    }
+                }
+            }
+        }
+    }
+}
+
+void SalvarArq(Aeroporto vet[], int n)
+{
+    Voo *p;
+    ofstream arq("Relatorio.bak", ios ::binary | ios::ate); // criar para gravacao
+    cout << "Aeroporto cadastrados." << endl;
+    for (int i = 0; i < n; i++)
+    {
+        arq << vet[i].cod;
+        cout << "|";
+        arq << vet[i].sigla << endl;
+        arq << vet[i].cidade << endl;
+        while (p != NULL)
+        {
+            arq << p->cod << " - " << p->numvoo << endl;
+            p = p->prox;
+        }
+    }
+    arq.close();
+}
+
+// void LerArq(Aeroporto vet[], int n)
+// {
+//     Voo *p;
+//     cout << "Dados do arquivo" << endl;
+//     rename()
+// }
+
+*/
+
+void destroiLista(Aeroporto vet[], int n)
+{
+    Voo *p;
+    for (int i = 0; i < n; i++)
+    {
+        while (vet[i].listaVoos != NULL)
+        {
+            p = vet[i].listaVoos;
+            vet[i].listaVoos = vet[i].listaVoos->prox;
+            delete p;
+        }
+    }
+}
