@@ -52,8 +52,8 @@ void cadastraVoo(Aeroporto[], int, int);
 void removeVoo(Aeroporto[], int, int);
 void mostraVoos(Aeroporto[], int);
 void retira(Aeroporto[], int, int);
-//  void procuraVoo(codigoOrigem, codigoDestino, maxConexoes)
-
+void procuraVoo(Aeroporto[], int);
+void exibeVoo(Aeroporto[], int, int, int);
 void destroiLista(Aeroporto[], int);
 
 int main()
@@ -134,9 +134,18 @@ int main()
                 cout << "\nAeroporto inexistente. Impossivel efetuar acao." << endl;
             else
             {
+                int variavel;
+                for (int i = 0; i < 10; i++)
+                {
+                    if (vet[i].cod == cod)
+                    {
+                        variavel = i;
+                        break;
+                    }
+                }
                 cout << "\nAeroporto: ";
-                cout << vet[cod].sigla << "-" << vet[cod].cidade << endl;
-                removeAeroporto(vet, n, cod);
+                cout << vet[variavel].sigla << "-" << vet[variavel].cidade << endl;
+                removeAeroporto(vet, n, variavel);
                 cout << "Aeroporto removido." << endl;
             }
             break;
@@ -240,7 +249,6 @@ int main()
                         break;
                     }
                 }
-
                 if (numv == vet[variavel].listaVoos->numvoo)
                 {
                     removeVoo(vet, variavel, numv);
@@ -259,8 +267,9 @@ int main()
                 mostraVoos(vet, i);
             }
             break;
-            //  case 7:
-            //   void procuraVoo(codigoOrigem, codigoDestino, maxConexoes)
+        case 7:
+            procuraVoo(vet, n);
+            break;
         }
         system("pause");
     } while (op != 8);
@@ -388,7 +397,7 @@ void mostraAeroporto(Aeroporto vet[], int n)
 
 void cadastraVoo(Aeroporto vet[], int codorigem, int coddestino)
 {
-    Voo *p = new Voo;
+    Voo *pant, *p = new Voo;
     srand(time(NULL));
     p->numvoo = rand() % 500 + 1;
     p->prox = NULL;
@@ -397,19 +406,22 @@ void cadastraVoo(Aeroporto vet[], int codorigem, int coddestino)
 
     for (int i = 0; i < 10; i++)
     {
-        cout << vet[i].cod << endl;
         if (vet[i].cod == codorigem)
         {
             variavel = i;
-            cout << variavel << endl;
             break;
         }
     }
 
     if (vet[variavel].listaVoos == NULL)
+    {
         vet[variavel].listaVoos = p;
-    else
-        vet[variavel].listaVoos->prox = p;
+        return;
+    }
+    pant = vet[variavel].listaVoos;
+    while (pant->prox != NULL)
+        pant = pant->prox;
+    pant->prox = p;
 }
 
 void removeVoo(Aeroporto vet[], int i, int elemento)
@@ -449,7 +461,6 @@ void mostraVoos(Aeroporto vet[], int i)
     }
 }
 
-/*
 void procuraVoo(Aeroporto vet[], int n)
 {
     int aero, cod, conex;
@@ -476,51 +487,57 @@ void procuraVoo(Aeroporto vet[], int n)
         {
             cout << "informe o numero de connexoes que deseja ver" << endl;
             cin >> conex;
-            exibeVoo(vet, cod, aero, conex, n);
+            exibeVoo(vet, cod, aero, n);
         }
     }
 }
 
-void exibeVoo(Aeroporto vet[], int codD, int codO, int conex, int n)
+void exibeVoo(Aeroporto vet[], int codD, int codO, int n)
 {
     for (int i = 0; i < n; i++)
     {
         if (codO == vet[i].cod)
         {
-            Voo *p = vet[i].listaVoos;
-            for (int j = 0; j < n; j++)
+            Voo *p;
+            p = vet[i].listaVoos;
+            while (p != NULL)
             {
-                if (codD == vet[j].cod)
+                if (codD == p->cod)
                 {
-                    Voo *q = vet[j].listaVoos;
-                    while (p != NULL)
+                    cout << "( " << p->numvoo << ") " << vet[i].sigla << " - ";
+                    for (int j = 0; j < n; j++)
                     {
+                        if (codD == vet[j].cod)
+                        {
+                            cout << vet[j].sigla << endl;
+                        }
                     }
                 }
+                p = p->prox;
             }
         }
     }
 }
 
-void SalvarArq(Aeroporto vet[], int n)
-{
-    Voo *p;
-    ofstream arq("Relatorio.bak", ios ::binary | ios::ate); // criar para gravacao
-    cout << "Aeroporto cadastrados." << endl;
-    for (int i = 0; i < n; i++)
-    {
-        arq << vet[i].cod;
-        cout << "|";
-        arq << vet[i].sigla << endl;
-        arq << vet[i].cidade << endl;
-        while (p != NULL)
-        {
-            arq << p->cod << " - " << p->numvoo << endl;
-            p = p->prox;
-        }
-    }
-    arq.close();
-}
+// void SalvarArq(Aeroporto vet[], int n)
+// {
+//     Voo *p;
+//     ofstream arq("Relatorio.bak", ios ::binary | ios::ate); // criar para gravacao
+//     cout << "Aeroporto cadastrados." << endl;
+//     for (int i = 0; i < n; i++)
+//     {
+//         arq << vet[i].cod;
+//         cout << "|";
+//         arq << vet[i].sigla << endl;
+//         arq << vet[i].cidade << endl;
+//         while (p != NULL)
+//         {
+//             arq << p->cod << " - " << p->numvoo << endl;
+//             p = p->prox;
+//         }
+//     }
+//     arq.close();
+// }
 
 // void LerArq(Aeroporto vet[], int n)
 // {
@@ -528,8 +545,6 @@ void SalvarArq(Aeroporto vet[], int n)
 //     cout << "Dados do arquivo" << endl;
 //     rename()
 // }
-
-*/
 
 void destroiLista(Aeroporto vet[], int n)
 {
