@@ -51,6 +51,7 @@ void mostraAeroporto(Aeroporto[], int);
 void cadastraVoo(Aeroporto[], int, int);
 void removeVoo(Aeroporto[], int, int);
 void mostraVoos(Aeroporto[], int);
+void retira(Aeroporto[], int, int);
 //  void procuraVoo(codigoOrigem, codigoDestino, maxConexoes)
 
 void destroiLista(Aeroporto[], int);
@@ -240,13 +241,13 @@ int main()
                     }
                 }
 
-                if (numv == vet[cod].listaVoos->numvoo)
+                if (numv == vet[variavel].listaVoos->numvoo)
                 {
-                removeVoo(vet, variavel, numv);
-                cout << "Voo removido." << endl;
+                    removeVoo(vet, variavel, numv);
+                    cout << "Voo removido." << endl;
                 }
                 else
-                   cout << "\nVoo inexistente. Impossivel efetuar acao." << endl;
+                    cout << "\nVoo inexistente. Impossivel efetuar acao." << endl;
             }
             break;
         case 6:
@@ -254,7 +255,7 @@ int main()
             for (int i = 0; i < n; i++)
             {
                 cout << "\nAeroporto: "
-                     << "|" << vet[i].cod << "| " << vet[i].cidade << endl;
+                     << "|" << vet[i].cod << "|" << vet[i].cidade << endl;
                 mostraVoos(vet, i);
             }
             break;
@@ -357,6 +358,7 @@ void cadastraAeroporto(Aeroporto vet[], int &n, string sigla, string cidade)
         }
     }
     vet[n].cod = rcode;
+    cout << "Codigo do Aeroporto: " << vet[n].cod;
     n++;
 }
 
@@ -395,9 +397,11 @@ void cadastraVoo(Aeroporto vet[], int codorigem, int coddestino)
 
     for (int i = 0; i < 10; i++)
     {
+        cout << vet[i].cod << endl;
         if (vet[i].cod == codorigem)
         {
             variavel = i;
+            cout << variavel << endl;
             break;
         }
     }
